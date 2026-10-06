@@ -19,7 +19,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Build release binary
-        run: swift build -c release
+        run: swift build -c release --arch arm64 --arch x86_64
 
       - name: Generate app icon (.icns) from source PNG
         run: |
@@ -41,7 +41,7 @@ jobs:
           APP=Spendot.app
           mkdir -p "$APP/Contents/MacOS"
           mkdir -p "$APP/Contents/Resources"
-          cp .build/release/Spendot "$APP/Contents/MacOS/Spendot"
+          cp .build/apple/Products/Release/Spendot "$APP/Contents/MacOS/Spendot"
           cp AppIcon.icns "$APP/Contents/Resources/AppIcon.icns"
           cat > "$APP/Contents/Info.plist" << 'EOF'
           <?xml version="1.0" encoding="UTF-8"?>
@@ -72,6 +72,7 @@ jobs:
           </plist>
           EOF
           chmod +x "$APP/Contents/MacOS/Spendot"
+          codesign --force --deep -s - "$APP"
 
       - name: Create DMG
         run: |
